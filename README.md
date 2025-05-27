@@ -14,6 +14,8 @@ A full-stack application for managing products built with React, Node.js, Expres
 
 ## Technology Stack
 
+added sample.env in both frontend and backend   -----------------------IMP--------------------------
+
 ### Backend
 - Node.js
 - Express
