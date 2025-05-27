@@ -80,7 +80,7 @@ A full-stack application for managing products built with React, Node.js, Expres
 
 4. Open your browser and visit:
    ```
-   http://localhost:3000
+   http://localhost:5173/
    ```
 
 ## Database Structure

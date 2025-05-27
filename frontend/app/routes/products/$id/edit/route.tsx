@@ -98,6 +98,8 @@ export default function EditProduct() {
   // Form submission handler
   const onSubmit = async (data: FormData) => {
     try {
+      setError(null); // Clear previous errors
+      
       // Extract selected material IDs
       const materialIds = materials
         .filter(mat => data[`material_${mat.material_id}`])
@@ -106,30 +108,37 @@ export default function EditProduct() {
       // Prepare form data
       const formData: Partial<Product> = {
         product_name: data.product_name,
-        SKU: data.SKU,
+        SKU: data.SKU.trim(), // Trim SKU to prevent whitespace issues
         category_id: parseInt(data.category_id),
         material_ids: materialIds,
         price: parseFloat(data.price),
         status: data.status
       };
       
-      // Add media URLs separately (not as Media objects since API expects string[])
+      // Add media URLs separately
       const mediaUrls = mediaInputs
         .filter(m => m.url.trim() !== '')
         .map(m => m.url);
       
       // Create or update product
       if (id && id !== 'new') {
-        await productApi.updateProduct(parseInt(id), { ...formData, media: mediaUrls });
+        const response = await productApi.updateProduct(parseInt(id), { ...formData, media: mediaUrls });
+        if (response.success) {
+          navigate('/');
+        }
       } else {
-        await productApi.createProduct({ ...formData, media: mediaUrls });
+        const response = await productApi.createProduct({ ...formData, media: mediaUrls });
+        if (response.success) {
+          navigate('/');
+        }
       }
-      
-      // Redirect to products list
-      navigate('/products');
-    } catch (err: unknown) {
-      const errorMessage = err instanceof Error ? err.message : 'An unknown error occurred';
+    } catch (err: any) {
+      // Enhanced error handling
+      const errorMessage = err.response?.data?.message || err.message || 'An unknown error occurred';
       setError(errorMessage);
+      
+      // Scroll to error message
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   };
   
@@ -177,7 +186,12 @@ export default function EditProduct() {
             <input
               className={`shadow appearance-none border rounded w-full py-2 px-3 text-gray-200 leading-tight focus:outline-none focus:shadow-outline ${errors.SKU ? 'border-red-500' : ''}`}
               type="text"
-              {...register('SKU', { required: 'SKU is required' })}
+              {...register('SKU', { 
+                required: 'SKU is required',
+                validate: {
+                  noWhitespace: (value) => value.trim() === value || 'SKU cannot contain leading or trailing spaces'
+                }
+              })}
             />
             {errors.SKU && (
               <p className="text-red-500 text-xs italic">{errors.SKU.message as string}</p>

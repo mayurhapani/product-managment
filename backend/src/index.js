@@ -1,9 +1,7 @@
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
-const productRoutes = require('./routes/productRoutes');
-const categoryRoutes = require('./routes/categoryRoutes');
-const materialRoutes = require('./routes/materialRoutes');
+const router = require('./routes');
 const { initializeDatabase } = require('./config/db');
 
 const app = express();
@@ -14,9 +12,7 @@ app.use(cors());
 app.use(express.json());
 
 // Routes
-app.use('/api/products', productRoutes);
-app.use('/api/categories', categoryRoutes);
-app.use('/api/materials', materialRoutes);
+app.use('/api', router);
 
 // Initialize database connection
 initializeDatabase();

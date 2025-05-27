@@ -1,4 +1,5 @@
 const mysql = require('mysql2/promise');
+const { encryptSKU } = require('../utils/cryptoUtils');
 require('dotenv').config();
 
 const pool = mysql.createPool({
@@ -107,15 +108,21 @@ const insertSampleData = async () => {
       ('Material1'), ('Material2'), ('Material3')
     `);
     
-    // Insert products
+    // Insert products with encrypted SKUs
     await pool.query(`
       INSERT INTO product (SKU, product_name, category_id, material_ids, price) VALUES 
-      ('f2821c0c88c19a99918d443', 'Product1', 1, '1,2', 1000),
-      ('f2821c0c88c19a99918d444', 'Product2', 2, '1', 2000),
-      ('f2821c0c88c19a99918d445', 'Product3', 3, '2', 3000),
-      ('f2821c0c88c19a99918d446', 'Product4', 1, '2', 4000),
-      ('f2821c0c88c19a99918d447', 'Product5', 1, '3', 5000)
-    `);
+      (?, 'Product1', 1, '1,2', 1000),
+      (?, 'Product2', 2, '1', 2000),
+      (?, 'Product3', 3, '2', 3000),
+      (?, 'Product4', 1, '2', 4000),
+      (?, 'Product5', 1, '3', 5000)
+    `, [
+      encryptSKU('f2821c0c88c19a99918d443'),
+      encryptSKU('f2821c0c88c19a99918d444'),
+      encryptSKU('f2821c0c88c19a99918d445'),
+      encryptSKU('f2821c0c88c19a99918d446'),
+      encryptSKU('f2821c0c88c19a99918d447')
+    ]);
     
     // Insert product media
     await pool.query(`
